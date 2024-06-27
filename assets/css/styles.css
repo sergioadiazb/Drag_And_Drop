@@ -1,6 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat+Brush&display=swap');
+
 body {
     font-family: Arial, sans-serif;
-    background-color:rgb(218, 241, 234);
+    background-color:rgb(232, 246, 241);
     margin: 0;
     padding: 0;
     display: flex;
@@ -47,7 +49,7 @@ nav button:hover {
 }
 
 h1 {
-    font-family: "Jersey 10", sans-serif;
+    font-family: "Caveat Brush", cursive;
     font-size: 3.5rem;
     margin-bottom: -5px;
     margin-top: -5px;
@@ -66,6 +68,40 @@ nav #timer {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.fton{
+    display: flex;
+    align-items: center;
+}
+
+.otherGames {
+    display: flex;
+    flex-direction: column;
+    padding-right: 20px;
+}
+
+.memoryGame:hover::after, .operationsGame:hover::after{
+    content: attr(data-hover);
+    background-color: #273a73;
+    color: white;
+    border: solid white;
+    border-radius: 20px;
+    position: absolute; 
+}
+
+.memoryGame {
+    background: url('/assets/img/memorygameicon.jpg') no-repeat;
+    width: 20px; 
+    height: 40px; 
+    border: none;  
+}
+
+.operationsGame {
+    background: url('/assets/img/opertionsgameicon.jpg') no-repeat;
+    width: 20px; 
+    height: 40px;
+    border: none; 
 }
 
 nav .allscores {

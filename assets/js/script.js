@@ -15,9 +15,11 @@ const totalCorrectCountElement = document.getElementById("totalCorrectCount");
 const totalErrorCountElement = document.getElementById("totalErrorCount");
 const levelElement = document.getElementById("level");
 const totalScoreElement = document.getElementById("totalscore");
-const playerInfoContainer = document.getElementById('player-info');
 
-let correctCount = 0;
+const soundWinGame = new Audio("./assets/sound/win_game.wav");
+const soundLevelUp = new Audio("./assets/sound/level_up.wav");
+const soundLoseGame = new Audio("./assets/sound/lose_game.wav");
+
 let errorCount = 0;
 let currentLevel = 0;
 let timerInterval;
@@ -26,10 +28,14 @@ let timerMinutes = 0;
 
 function startTimer() {
   timerInterval = setInterval(updateTimer, 1000);
+  
+
 }
 
 function updateTimer() {
   timerSeconds++;
+  totalScoreElement.textContent = parseInt(totalScoreElement.textContent) - 1;
+
   if (timerSeconds === 60) {
     timerMinutes++;
     timerSeconds = 0;
@@ -57,9 +63,8 @@ function restartGame() {
   errorCountElement.textContent = errorCount;
   totalCorrectCountElement.textContent = correctCount;
   totalErrorCountElement.textContent = errorCount;
-  totalScoreElement.textContent = 0;
+  totalScoreElement.textContent = 1000;
   restartTimer(); // Reiniciar el temporizador al reiniciar el juego
-  playerInfoContainer.style.display = 'none'; // Ocultar el formulario
   draw();
 }
 
@@ -85,17 +90,26 @@ function showCompletionMessage() {
   const finalTime = timerElement.textContent; // Captura el tiempo final
   const scoreGrade = calculateScoreGrade(totalScore, totalCorrect, totalErrors); // Calcula la nota
 
+  soundWinGame.play();
+
   Swal.fire({
-    title: '¡Felicidades por terminar el juego!',
-    html: `<p>Puntaje: ${totalScore}</p>
-           <p>Aciertos totales: ${totalCorrect}</p>
-           <p>Errores totales: ${totalErrors}</p>
-           <p>Nota: ${scoreGrade}</p>
-           <p>Tiempo total de juego: ${finalTime}</p>`,
+    title: '¡Felicidades por ganar el juego!',
+    text: `Su nota es: ${scoreGrade}`,
+    footer: `Tiempo total: ${finalTime}, Puntaje total: ${totalScore}`,
     icon: 'success',
-    confirmButtonText: 'OK'
-  }).then(() => {
-    playerInfoContainer.style.display = 'block'; // Mostrar el formulario
+    confirmButtonText: 'Jugar de nuevo'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      document.getElementById("player-info").style.display = "block";
+      document.getElementById("mainGame").style.display = "none";
+      document.getElementById("playerForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+        document.getElementById("player-info").style.display = "none";
+        document.getElementById("mainGame").style.display = "block";
+        stopTimer();
+        resetGame();
+      });
+    }
   });
 }
 
@@ -185,6 +199,7 @@ function handleDrop(event) {
   totalErrorCountElement.textContent = parseInt(totalErrorCountElement.textContent) + (problemIndex !== answerIndex ? 1 : 0);
 
   if (correctCount === levels[currentLevel]) {
+    soundLevelUp.play();
     setTimeout(() => {
       Swal.fire({
         title: `¡Felicidades! Has completado el nivel ${currentLevel + 1}.`,
@@ -201,14 +216,14 @@ restartButton.addEventListener('click', restartGame);
 startTimerButton.addEventListener('click', startTimer);
 restartGame();
 
-document.getElementById("playerForm").addEventListener("submit", function(event) {
+document.getElementById("playerForm").addEventListener("submit", function (event) {
   event.preventDefault();
-  
+
   const name = document.getElementById("name").value;
   const age = document.getElementById("age").value;
-  const grade = document.getElementById("grade").value; 
+  const grade = document.getElementById("grade").value;
   const school = document.getElementById("schools").value;
-  
+
   // Variables que ya están definidas en el script.js
   const totalScore = parseInt(totalScoreElement.textContent);
   const totalCorrectCount = parseInt(totalCorrectCountElement.textContent);
@@ -225,8 +240,6 @@ document.getElementById("playerForm").addEventListener("submit", function(event)
     name,
     age,
     grade,
-    hit: totalCorrectCount,
-    failure: totalErrorCount,
     note: scoreGrade,
     idSchool: parseInt(school),
     score: totalScore,
